@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Projeto Pagina Dinamica</title>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">      
+        <hr>
+        <h4 class="m-auto">Lista de Teste</h4>
+        <!-- <button class="btn btn-outline-success" onclick='refresh()'>Atualizar</button>-->
+        <ul id='games'></ul>
+        
+        <hr>
+        <h4>Novo Game</h4>
+        <input type="text" name='title' id='title' placeholder='Título'><br>
+        <input type="number" name='year' id='year' placeholder='Ano'><br>
+        <input type="number" name='price' id='price' placeholder='Preço'><br>
+        <button class='btn btn-danger' onclick='createGame()' type='button'>Criar</button>
+        <hr>
+        <h4>Editar Game</h4>
+        <input type="text" name='idEdit' id='idEdit' placeholder='ID' readonly><br>
+        <input type="text" name='titleEdit' id='titleEdit' placeholder='Título'><br>
+        <input type="number" name='yearEdit' id='yearEdit' placeholder='Ano'><br>
+        <input type="number" name='priceEdit' id='priceEdit' placeholder='Preço'><br>
+        <button class='btn btn-danger' onclick='updateGame()' type='button'>Editar</button>
+        
+    </head>
+    <body>
+    
+    </body>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+                
+        function createGame(){
+            var titleInput = document.getElementById('title')
+            var yearInput = document.getElementById('year')
+            var priceInput = document.getElementById('price')
+
+            var game = {
+                title: titleInput.value,
+                year: yearInput.value,
+                price: priceInput.value
+            }
+
+            axios.post('http://localhost:45678/game', game).then(res => {
+                if(res.status == 200){
+                    alert('game cadastrado!')
+                }
+            }).catch(err => {
+                console.log(err)
+            })
+        }
+        
+        function deleteGame(listItem){
+            var id = listItem.getAttribute('data-id')
+            axios.delete('http://localhost:45678/game/'+id).then(res => {
+                alert('pronto')
+            }).catch(err => {
+                console.log(err)
+            })
+        }
+
+        function loadForm(listItem){
+            var id = listItem.getAttribute('data-id')
+            var title = listItem.getAttribute('data-title')
+            var year = listItem.getAttribute('data-year')
+            var price = listItem.getAttribute('data-price')
+            document.getElementById('idEdit').value = id
+            document.getElementById('titleEdit').value = title
+            document.getElementById('yearEdit').value = year
+            document.getElementById('priceEdit').value = price
+        }
+
+        function updateGame(){
+            var idInput = document.getElementById('idEdit')
+            var titleInput = document.getElementById('titleEdit')
+            var yearInput = document.getElementById('yearEdit')
+            var priceInput = document.getElementById('priceEdit')
+
+            var game = {
+                title: titleInput.value,
+                year: yearInput.value,
+                price: priceInput.value
+            }
+
+            var id = idInput.value
+
+            axios.put('http://localhost:45678/game/'+id, game).then(res => {
+                if(res.status == 200){
+                    alert('game atualizado!')
+                }
+            }).catch(err => {
+                console.log(err)
+            })
+        }
+
+        axios.get('http://localhost:45678/games').then(res => {
+            var games = res.data
+            var list = document.getElementById('games')
+
+            games.forEach(game => {
+                var item = document.createElement('li')
+                item.setAttribute('data-id', game.id)
+                item.setAttribute('data-title', game.title)
+                item.setAttribute('data-year', game.year)
+                item.setAttribute('data-price', game.price)
+                item.innerHTML = game.id + ' - ' + game.title + ' - ' + ' - ' + game.price + " - "
+                
+                var deleteBtn = document.createElement('button')
+                deleteBtn.innerHTML = 'Deletar'
+                deleteBtn.setAttribute('class','btn btn-danger btn-sm')
+                deleteBtn.addEventListener('click',function(){
+                    deleteGame(item)
+                })
+                
+                var editBtn = document.createElement('button')
+                editBtn.innerHTML = 'Editar'
+                editBtn.setAttribute('class','btn btn-primary btn-sm')
+                editBtn.addEventListener('click',function(){
+                    loadForm(item)
+                })
+
+
+                item.appendChild(deleteBtn)
+                item.appendChild(editBtn)
+                list.appendChild(item)
+            })
+            
+        }).catch(err => {
+            console.log(err)
+        })
+    </script>
+    <!-- JS, Popper.js, and jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+</html>
+
+
+
+
+
